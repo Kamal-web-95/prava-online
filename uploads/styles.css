@@ -974,12 +974,7 @@ button {
     }
 
     .header__cta-btn {
-        font-size: 0;
-        width: 45px;
-        height: 45px;
-        border-radius: 100%;
-        padding: 0;
-        margin-bottom: -3px
+        display: none !important;
     }
 
     .header__logo {
@@ -4629,4 +4624,9 @@ button {
     height: 1.125rem;
     flex-shrink: 0;
     opacity: 0.9;
+}
+@media (min-width: 769px) {
+    .header__nav.mobile-nav {
+        display: none !important;
+    }
 }
