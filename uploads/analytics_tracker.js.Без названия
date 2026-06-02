@@ -1,0 +1,69 @@
+(function() {
+    'use strict';
+    
+    // Конфигурация
+    const ANALYTICS_CONFIG = {
+        apiUrl: '/',
+        debug: false
+    };
+    
+    // API клиент
+    const ApiClient = {
+        sendEvent: function(eventType, data) {
+            const url = `${ANALYTICS_CONFIG.apiUrl}?analytics=1&type=${eventType}`;
+            
+            const eventData = {
+                ...data,
+                domain: window.location.hostname,
+                page_url: window.location.href,
+                timestamp: new Date().toISOString()
+            };
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(eventData)
+            }).catch(error => {
+                console.error('Analytics error:', error);
+            });
+        }
+    };
+    
+    // Трекер WhatsApp кликов
+    const WhatsAppTracker = {
+        init: function() {
+            document.addEventListener('click', (event) => {
+                const target = event.target.closest('a');
+                if (!target) return;
+                
+                const href = target.getAttribute('href');
+                if (href && (href.includes('wa.me') || href.includes('whatsapp'))) {
+                    this.trackClick(target, href);
+                }
+            });
+        },
+        
+        trackClick: function(element, href) {
+            const eventData = {
+                link_href: href,
+                link_text: element.textContent.trim(),
+                element_class: element.className,
+                element_id: element.id
+            };
+            
+            ApiClient.sendEvent('whatsapp', eventData);
+        }
+    };
+    
+    // Инициализация
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            WhatsAppTracker.init();
+        });
+    } else {
+        WhatsAppTracker.init();
+    }
+    
+})();
